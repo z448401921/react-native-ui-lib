@@ -18,6 +18,7 @@ import com.reactnativenavigation.react.ReactGateway;
 import com.cmcewen.blurview.BlurViewPackage;
 import com.wix.reactnativeuilib.highlighterview.HighlighterViewPackage;
 import com.wix.reactnativeuilib.textinput.TextInputDelKeyHandlerPackage;
+import com.wix.reactnativeuilib.translate.TranslatePackage;
 import com.wix.reactnativeuilib.wheelpicker.WheelPickerPackage;
 
 import java.util.Arrays;
@@ -49,7 +50,8 @@ public class MainApplication extends NavigationApplication {
             new TextInputDelKeyHandlerPackage(),
             new BlurViewPackage(),
             new HighlighterViewPackage(),
-            new WheelPickerPackage()
+            new WheelPickerPackage(),
+            new TranslatePackage()
         );
     }
 
