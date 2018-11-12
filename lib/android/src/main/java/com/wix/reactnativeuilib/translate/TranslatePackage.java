@@ -1,7 +1,6 @@
 package com.wix.reactnativeuilib.translate;
 
 import com.facebook.react.ReactPackage;
-import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
@@ -19,11 +18,6 @@ public class TranslatePackage implements ReactPackage {
         modules.add(new TranslateManager(reactContext));
 
         return modules;
-    }
-
-    @Override
-    public List<Class<? extends JavaScriptModule>> createJSModules() {
-        return Collections.emptyList();
     }
 
     @Override
