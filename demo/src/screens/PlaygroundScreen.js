@@ -1,22 +1,32 @@
 import React, {Component} from 'react';
-import {StyleSheet} from 'react-native';
-import {Colors, Constants, View, Text, Button, Modal} from 'react-native-ui-lib'; //eslint-disable-line
+import {StyleSheet, ScrollView, Clipboard} from 'react-native';
+import {Colors, View, Text} from 'react-native-ui-lib'; //eslint-disable-line
+import CountryNativeData from '../data/countrydata';
 
 export default class PlaygroundScreen extends Component {
   static id = 'unicorn.Playground';
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      countryNames: undefined,
+    };
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    CountryNativeData.getCountryByLocale('en', (result) => {
+      Clipboard.setString(result);
+      this.setState({
+        countryNames: result,
+      });
+    });
+  }
 
   render() {
     return (
-      <View flex center style={styles.container}>
-        <Text>Unicorn Playground Screen</Text>
-      </View>
+      <ScrollView flex center style={styles.container}>
+        <Text>{JSON.stringify(this.state.countryNames)}</Text>
+      </ScrollView>
     );
   }
 }

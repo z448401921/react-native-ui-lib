@@ -15,7 +15,7 @@ public class TranslatePackage implements ReactPackage {
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
 
-        modules.add(new TranslateManager(reactContext));
+        modules.add(new CountryNativeData(reactContext));
 
         return modules;
     }
