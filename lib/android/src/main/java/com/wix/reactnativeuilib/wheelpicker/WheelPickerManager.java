@@ -1,5 +1,6 @@
 package com.wix.reactnativeuilib.wheelpicker;
 
+import android.view.View;
 import android.widget.NumberPicker;
 
 import com.facebook.react.bridge.ReadableArray;
@@ -34,15 +35,25 @@ public class WheelPickerManager extends SimpleViewManager<WheelPicker> {
 
     @ReactProp(name = "data")
     public void setData(WheelPicker wheelPicker, @Nullable ReadableArray data) {
-        ArrayList dataList = data.toArrayList();
+        ArrayList dataList;
+        if (data != null) {
+            dataList = data.toArrayList();
+        } else {
+            dataList = new ArrayList();
+        }
         final String[] arrayString= (String[]) dataList.toArray(new String[0]);
 
-        NumberPicker numberPicker = wheelPicker;
-        numberPicker.setDisplayedValues(null);
-        numberPicker.setWrapSelectorWheel(false);
-        numberPicker.setMinValue(0);
-        numberPicker.setMaxValue(arrayString.length -1);
-        numberPicker.setDisplayedValues( arrayString );
+        try {
+            throw new Exception("exeption");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        wheelPicker.setDisplayedValues(null);
+        wheelPicker.setWrapSelectorWheel(false);
+        wheelPicker.setMinValue(0);
+        wheelPicker.setMaxValue(arrayString.length -1);
+        wheelPicker.setDisplayedValues( arrayString );
     }
 
     public Map getExportedCustomBubblingEventTypeConstants() {

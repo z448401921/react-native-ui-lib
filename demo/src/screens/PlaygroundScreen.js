@@ -14,14 +14,14 @@ export default class PlaygroundScreen extends Component {
   }
 
   componentDidMount() {
-    CountryNativeData.getCountryByLocale('en', (result) => {
-      Clipboard.setString(result);
-      this.setState({
-        countryNames: result,
-      });
-    });
+    CountryNativeData.updateLanguage('en');
+    this.getCountries();
   }
-
+  getCountries = async () => {
+    const countries = await CountryNativeData.getCountriesData();
+    console.log('countries', countries);
+    Clipboard.setString(countries);
+  };
   render() {
     return (
       <ScrollView flex center style={styles.container}>
