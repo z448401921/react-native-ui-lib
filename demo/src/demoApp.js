@@ -37,16 +37,9 @@ import {registerScreens} from './screens';
 //   }
 // });
 
-Assets.loadAssetsGroup('icons.general', {
-  camera: require('./assets/icons/cameraSelected.png'),
-});
-
-Animatable.initializeRegistryWithDefinitions({
-  gridListEntrance: {
-    from: {opacity: 0, translateY: 15},
-    to: {opacity: 1, translateY: 0},
-  },
-});
+// Assets.loadAssetsGroup('icons.general', {
+//   camera: require('./assets/icons/cameraSelected.png'),
+// });
 
 Animatable.initializeRegistryWithDefinitions({
   basicListEntrance: {
@@ -60,7 +53,7 @@ function getDefaultNavigationStyle() {
     statusBar: {
       visible: true,
       style: 'light',
-      backgroundColor: Colors.violet30, // for Android
+      backgroundColor: ThemeManager.primaryColor, // for Android
     },
     layout: {
       backgroundColor: Colors.white,
@@ -71,7 +64,7 @@ function getDefaultNavigationStyle() {
       noBorder: true, // for iOS
       elevation: 0, // for Android
       background: {
-        color: Colors.violet30,
+        color: ThemeManager.primaryColor,
       },
       title: {
         color: Colors.white,
@@ -111,7 +104,7 @@ function startApp(defaultScreen) {
               options: {
                 topBar: {
                   title: {
-                    text: 'Wix UI Lib',
+                    text: 'UILIB',
                   },
                 },
               },

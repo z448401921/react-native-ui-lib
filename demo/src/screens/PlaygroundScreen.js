@@ -4,8 +4,7 @@ import {Colors, View, Text} from 'react-native-ui-lib'; //eslint-disable-line
 import CountryNativeData from '../data/countrydata';
 
 export default class PlaygroundScreen extends Component {
-  static id = 'unicorn.Playground';
-
+  
   constructor(props) {
     super(props);
     this.state = {

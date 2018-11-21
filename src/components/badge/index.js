@@ -7,6 +7,7 @@ import {BaseComponent} from '../../commons';
 import {Typography, ThemeManager, BorderRadiuses} from '../../style';
 
 
+const SIZE_PIMPLE = 4.5;
 const SIZE_DEFAULT = 20;
 const WIDTH_DOUBLE = 28;
 const WIDTH_TRIPLE = 35;
@@ -71,23 +72,25 @@ export default class Badge extends BaseComponent {
 
   getBadgeSizeStyle() {
     const {label, borderWidth} = this.props;
-    const numberOfCharacters = label.length;
     let height = this.isSmallBadge() ? SIZE_SMALL : SIZE_DEFAULT;
     let width = 0;
-    
-    switch (numberOfCharacters) {
-      case 0:
-        width = this.isSmallBadge() ? SIZE_SMALL : SIZE_DEFAULT;
-        break;
-      case 1:
-        width = this.isSmallBadge() ? SIZE_SMALL : SIZE_DEFAULT;
-        break;
-      case 2:
-        width = this.isSmallBadge() ? WIDTH_DOUBLE_SMALL : WIDTH_DOUBLE;
-        break;
-      default:
-        width = this.isSmallBadge() ? WIDTH_TRIPLE_SMALL : WIDTH_TRIPLE;
-        break;
+    if (label === undefined) {
+      width = SIZE_PIMPLE;
+      height = SIZE_PIMPLE;
+    } else {
+      const numberOfCharacters = label.length;
+      switch (numberOfCharacters) {
+        case 0:
+        case 1:
+          width = this.isSmallBadge() ? SIZE_SMALL : SIZE_DEFAULT;
+          break;
+        case 2:
+          width = this.isSmallBadge() ? WIDTH_DOUBLE_SMALL : WIDTH_DOUBLE;
+          break;
+        default:
+          width = this.isSmallBadge() ? WIDTH_TRIPLE_SMALL : WIDTH_TRIPLE;
+          break;
+      }
     }
 
     if (borderWidth) {
