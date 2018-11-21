@@ -43,12 +43,6 @@ public class WheelPickerManager extends SimpleViewManager<WheelPicker> {
         }
         final String[] arrayString= (String[]) dataList.toArray(new String[0]);
 
-        try {
-            throw new Exception("exeption");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         wheelPicker.setDisplayedValues(null);
         wheelPicker.setWrapSelectorWheel(false);
         wheelPicker.setMinValue(0);
