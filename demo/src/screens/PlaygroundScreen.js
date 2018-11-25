@@ -4,7 +4,7 @@ import {Colors, View, Text} from 'react-native-ui-lib'; //eslint-disable-line
 import CountryNativeData from '../data/countrydata';
 
 export default class PlaygroundScreen extends Component {
-  
+
   constructor(props) {
     super(props);
     this.state = {
@@ -13,14 +13,19 @@ export default class PlaygroundScreen extends Component {
   }
 
   componentDidMount() {
-    CountryNativeData.updateLanguage('en');
-    this.getCountries();
+    setTimeout(() => {
+      CountryNativeData.updateLanguage('en');
+      this.getCountries();
+    }, 5000);
   }
+
   getCountries = async () => {
-    const countries = await CountryNativeData.getCountriesData();
+    const countries = await CountryNativeData.loadCountriesDialCode();
+    const countries1 = await CountryNativeData.loadCountriesCurrency();
     console.log('countries', countries);
-    Clipboard.setString(countries);
+    Clipboard.setString(countries1);
   };
+
   render() {
     return (
       <ScrollView flex center style={styles.container}>
