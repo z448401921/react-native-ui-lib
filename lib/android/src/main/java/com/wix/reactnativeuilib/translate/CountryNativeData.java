@@ -57,7 +57,7 @@ public class CountryNativeData extends ReactContextBaseJavaModule {
                 if (!countryMap.isEmpty()) {
                     countryMap.clear();
                 }
-                long b = System.currentTimeMillis();
+//                long b = System.currentTimeMillis();
                 languageLocale = new Locale.Builder().setLanguage(language).build();
                 for (String country : Locale.getISOCountries()) {
                     Locale locale = new Locale.Builder().setRegion(country).build();
@@ -65,9 +65,9 @@ public class CountryNativeData extends ReactContextBaseJavaModule {
                     initCountryMap(locale);
                 }
 //                addDialCodeToCountryData();
-                long a = System.currentTimeMillis();
+//                long a = System.currentTimeMillis();
 
-                Log.e(CountryNativeData.this.getName(), "Time: " + (a - b));
+//                Log.e(CountryNativeData.this.getName(), "Time: " + (a - b));
                 lock.release();
             }
         }, "country_thread").start();
@@ -139,29 +139,29 @@ public class CountryNativeData extends ReactContextBaseJavaModule {
         return new JSONObject(countryMapParsed).toString();
     }
 
-    private void loadCountries(JSONObject dialCodeJson) {
-        for (Locale locale : countryLocale) {
-            String countryID = locale.getCountry();
-            CountryData countryData = (CountryData) countryMap.get(countryID);
-            try {
-                Currency currency = Currency.getInstance(locale);
-                if (currency != null) {
-                    countryData.setCurrencyName(currency.getDisplayName());
-                    countryData.setCurrencySymbol(currency.getSymbol());
-                }
-                if (dialCodeJson.get(countryID) != null) {
-                    countryData.setDialCode(dialCodeJson.get(countryID).toString());
-                }
-                counter++;
-            } catch (Exception e) {
-            }
-        }
-    }
-
-    private void addDialCodeToCountryData() {
-        JSONObject dialCodeJson = getJsonFromRaw(R.raw.country_dial_code);
-        loadCountries(dialCodeJson);
-    }
+//    private void addDialCodeToCountryData() {
+//        JSONObject dialCodeJson = getJsonFromRaw(R.raw.country_dial_code);
+//        loadCountries(dialCodeJson);
+//    }
+//
+//    private void loadCountries(JSONObject dialCodeJson) {
+//        for (Locale locale : countryLocale) {
+//            String countryID = locale.getCountry();
+//            CountryData countryData = (CountryData) countryMap.get(countryID);
+//            try {
+//                Currency currency = Currency.getInstance(locale);
+//                if (currency != null) {
+//                    countryData.setCurrencyName(currency.getDisplayName());
+//                    countryData.setCurrencySymbol(currency.getSymbol());
+//                }
+//                if (dialCodeJson.get(countryID) != null) {
+//                    countryData.setDialCode(dialCodeJson.get(countryID).toString());
+//                }
+//                counter++;
+//            } catch (Exception e) {
+//            }
+//        }
+//    }
 
 //    public void getCurrencyLocaleMap() {
 //        for (Locale locale : Locale.getAvailableLocales()) {
@@ -211,17 +211,17 @@ public class CountryNativeData extends ReactContextBaseJavaModule {
         return jsonObject;
     }
 
-    // can be slow method.
-    @TargetApi(21)
-    @ReactMethod
-    public synchronized void getCountriesData(Promise promise) throws InterruptedException {
-        long b = System.currentTimeMillis();
-        lock.acquire();
-        String countryDataAsString = new JSONObject(countryMap).toString();
-        Log.e(this.getName(), "count: " + counter);
-        promise.resolve(countryDataAsString);
-        long a = System.currentTimeMillis();
-        Log.e(CountryNativeData.this.getName(), "Time: " + (a - b));
-        lock.release();
-    }
+//    // can be slow method.
+//    @TargetApi(21)
+//    @ReactMethod
+//    public synchronized void getCountriesData(Promise promise) throws InterruptedException {
+//        long b = System.currentTimeMillis();
+//        lock.acquire();
+//        String countryDataAsString = new JSONObject(countryMap).toString();
+//        Log.e(this.getName(), "count: " + counter);
+//        promise.resolve(countryDataAsString);
+//        long a = System.currentTimeMillis();
+//        Log.e(CountryNativeData.this.getName(), "Time: " + (a - b));
+//        lock.release();
+//    }
 }
