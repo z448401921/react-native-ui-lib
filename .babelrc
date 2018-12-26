@@ -1,5 +1,17 @@
 {
   "presets": ["module:metro-react-native-babel-preset"],
   "retainLines": true,
-  "plugins": ["transform-inline-environment-variables"]
+  "plugins": [
+    "transform-inline-environment-variables",
+    [
+      "module-resolver",
+      {
+        "root": ["./"],
+        "alias": {
+          "react-dom": "react-dom/profiling",
+          "scheduler/tracing": "scheduler/tracing-profiling"
+        }
+      }
+    ]
+  ]
 }
