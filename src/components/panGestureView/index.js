@@ -61,6 +61,7 @@ export default class PanGestureView extends BaseComponent {
     });
 
     this.isHorizontal = (props.direction === DIRECTIONS.LEFT || props.direction === DIRECTIONS.RIGHT);
+    this.translate = this.isHorizontal ? this.state.deltaX : this.state.deltaY;
   }
 
   handleMoveShouldSetPanResponder = (e, gestureState) => {
@@ -71,15 +72,15 @@ export default class PanGestureView extends BaseComponent {
   handlePanResponderGrant = () => {
     this.swipe = false;
   };
-  handlePanResponderMove = (e, gestureState) => {    
-    this.animateMove(
-      this.isHorizontal ? gestureState.dx : gestureState.dy, 
-      this.isHorizontal ? gestureState.vx : gestureState.vy
-    );
+  handlePanResponderMove = (e, gestureState) => {
+    const delta = this.isHorizontal ? gestureState.dx : gestureState.dy;
+    const velocity = this.isHorizontal ? gestureState.vx : gestureState.vy;
+    
+    this.animateMove(delta, velocity);
   };
   handlePanResponderEnd = () => {
-    if (!this.swipe) {      
-      this.animateEnd(this.isHorizontal ? this.state.deltaX : this.state.deltaY);
+    if (!this.swipe) {  
+      this.animateEnd();
     } else {
       this.animateSwipe();
     }
@@ -97,21 +98,20 @@ export default class PanGestureView extends BaseComponent {
       }
     } else if ((condition && delta < 0) || (!condition && delta > 0)) {
       // Drag
-      const transform = this.isHorizontal ? this.state.deltaX : this.state.deltaY;
-      this.animateDelta(transform, Math.round(delta));
+      this.animateDelta(Math.round(delta));
     }
   }
-  animateEnd(transform) {
+  animateEnd() {
     const {direction, onDismiss} = this.getThemeProps();
     const condition = this.isHorizontal ? (direction === DIRECTIONS.LEFT) : (direction === DIRECTIONS.UP);
     const threshold = this.isHorizontal ? this.layout.width / 2 : this.layout.height / 2;
-    const endValue = Math.round(transform._value); // eslint-disable-line
+    const endValue = Math.round(this.translate._value); // eslint-disable-line
     
     if (onDismiss && ((condition && endValue <= -threshold) || (!condition && endValue >= threshold))) {
       this.animateDismiss();
     } else {
       // back to initial position
-      this.animateDelta(transform, 0);
+      this.animateDelta(0);
     }
   }
   animateSwipe() {
@@ -125,14 +125,13 @@ export default class PanGestureView extends BaseComponent {
   }
   animateDeltaLimit() {
     const {direction} = this.getThemeProps();
-    const delta = (this.isHorizontal) ? this.state.deltaX : this.state.deltaY;
     const newValue = (direction === DIRECTIONS.UP || direction === DIRECTIONS.LEFT) ?
       -this.props.deltaLimit : this.props.deltaLimit;
     
-    this.animateDelta(delta, newValue);
+    this.animateDelta(newValue);
   }
-  animateDelta(translate, toValue) {
-    Animated.spring(translate, {
+  animateDelta(toValue) {
+    Animated.spring(this.translate, {
       toValue,
       speed: SPEED,
       bounciness: BOUNCINESS
@@ -145,7 +144,7 @@ export default class PanGestureView extends BaseComponent {
 
     if (this.isHorizontal) {
       translate = this.state.deltaX;
-      newValue = direction === DIRECTIONS.LEFT ? -Constants.screenWidth : Constants.screenWidth;
+      newValue = (direction === DIRECTIONS.LEFT) ? -Constants.screenWidth : Constants.screenWidth;
     } else {
       translate = this.state.deltaY;
       newValue = (direction === DIRECTIONS.UP) ? -Constants.screenHeight : Constants.screenHeight;
@@ -156,18 +155,15 @@ export default class PanGestureView extends BaseComponent {
       duration: 280
     }).start(this.onAnimatedFinished);
   }
-
   onAnimatedFinished = ({finished}) => {
     if (finished) {
       this.onDismiss();
     }
   }
-
   onDismiss = () => {
     this.initPositions();
     _.invoke(this.props, 'onDismiss');
   }
-
   initPositions() {
     this.setState({
       deltaY: new Animated.Value(0),
