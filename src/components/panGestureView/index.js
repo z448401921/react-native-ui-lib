@@ -32,14 +32,14 @@ export default class PanGestureView extends BaseComponent {
      */
     direction: PropTypes.oneOf(Object.values(DIRECTIONS)),
     /**
-     * The delta to animate instead of dismissing
+     * The delta to animate on swipe instead of dismiss animation
      */
-    deltaLimit: PropTypes.number
+    snapPoint: PropTypes.number
   };
 
   static defaultProps = {
     direction: DIRECTIONS.DOWN,
-    deltaLimit: 200
+    snapPoint: 200
   };
   
   static directions = DIRECTIONS;
@@ -74,6 +74,7 @@ export default class PanGestureView extends BaseComponent {
   };
   handlePanResponderMove = (e, gestureState) => {
     const delta = this.isHorizontal ? gestureState.dx : gestureState.dy;
+    // console.warn(`delta: ${delta}`);
     const velocity = this.isHorizontal ? gestureState.vx : gestureState.vy;
     
     this.animateMove(delta, velocity);
@@ -120,13 +121,13 @@ export default class PanGestureView extends BaseComponent {
     if (onDismiss) {
       this.animateDismiss();
     } else {
-      this.animateDeltaLimit();
+      this.animateSnapPoint();
     }
   }
-  animateDeltaLimit() {
+  animateSnapPoint() {
     const {direction} = this.getThemeProps();
     const newValue = (direction === DIRECTIONS.UP || direction === DIRECTIONS.LEFT) ?
-      -this.props.deltaLimit : this.props.deltaLimit;
+      -this.props.snapPoint : this.props.snapPoint;
     
     this.animateDelta(newValue);
   }
