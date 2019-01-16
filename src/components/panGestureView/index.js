@@ -7,16 +7,18 @@ import {BaseComponent} from '../../commons';
 
 
 const DIRECTIONS = {
-  // VERTICAL
   UP: 'up',
-  DOWN: 'down'
+  DOWN: 'down',
+  LEFT: 'left',
+  RIGHT: 'right'
 };
 const SWIPE_VELOCITY = 1.8;
 const SPEED = 20;
 const BOUNCINESS = 6;
 
 /**
- * @description: PanGestureView component for drag and swipe gestures (supports only vertical gestures at the moment)
+ * @description: PanGestureView component for drag and swipe gestures 
+ * (supports vertical (up || down) and horizontal (left || right))
  */
 export default class PanGestureView extends BaseComponent {
   static displayName = 'PanGestureView'
@@ -28,11 +30,16 @@ export default class PanGestureView extends BaseComponent {
     /**
      * The direction of the allowed pan (default is down)
      */
-    direction: PropTypes.oneOf(Object.values(DIRECTIONS))
+    direction: PropTypes.oneOf(Object.values(DIRECTIONS)),
+    /**
+     * The delta to animate instead of dismissing
+     */
+    deltaLimit: PropTypes.number
   };
 
   static defaultProps = {
-    direction: DIRECTIONS.DOWN
+    direction: DIRECTIONS.DOWN,
+    deltaLimit: 200
   };
   
   static directions = DIRECTIONS;
@@ -41,7 +48,8 @@ export default class PanGestureView extends BaseComponent {
     super(props);
 
     this.state = {
-      deltaY: new Animated.Value(0)
+      deltaY: new Animated.Value(0),
+      deltaX: new Animated.Value(0)
     };
 
     this.panResponder = PanResponder.create({
@@ -51,6 +59,8 @@ export default class PanGestureView extends BaseComponent {
       onPanResponderRelease: this.handlePanResponderEnd,
       onPanResponderTerminate: this.handlePanResponderEnd
     });
+
+    this.isHorizontal = (props.direction === DIRECTIONS.LEFT || props.direction === DIRECTIONS.RIGHT);
   }
 
   handleMoveShouldSetPanResponder = (e, gestureState) => {
@@ -61,66 +71,87 @@ export default class PanGestureView extends BaseComponent {
   handlePanResponderGrant = () => {
     this.swipe = false;
   };
-  handlePanResponderMove = (e, gestureState) => {
-    const {direction} = this.getThemeProps();
-    let newValue = 0;
-    
-    // VERTICAL
-    const up = (direction === DIRECTIONS.UP);
-    const panDeltaY = gestureState.dy;
-    const panVelocityY = gestureState.vy;
+  handlePanResponderMove = (e, gestureState) => {    
+    this.animateMove(
+      this.isHorizontal ? gestureState.dx : gestureState.dy, 
+      this.isHorizontal ? gestureState.vx : gestureState.vy
+    );
+  };
+  handlePanResponderEnd = () => {
+    if (!this.swipe) {      
+      this.animateEnd(this.isHorizontal ? this.state.deltaX : this.state.deltaY);
+    } else {
+      this.animateSwipe();
+    }
+  };
 
-    if (Math.abs(panVelocityY) >= SWIPE_VELOCITY) {
-      if ((up && panVelocityY < 0) || (!up && panVelocityY > 0)) {
+  animateMove(delta, velocity) {
+    const {direction} = this.getThemeProps();
+    const condition = this.isHorizontal ? (direction === DIRECTIONS.LEFT) : (direction === DIRECTIONS.UP);
+
+    if (Math.abs(velocity) >= SWIPE_VELOCITY) {
+      // check velocity direction match direction
+      if ((condition && velocity < 0) || (!condition && velocity > 0)) {
         // Swipe
         this.swipe = true;
       }
-    } else if ((up && panDeltaY < 0) || (!up && panDeltaY > 0)) {
+    } else if ((condition && delta < 0) || (!condition && delta > 0)) {
       // Drag
-      newValue = panDeltaY;
-      this.animateDeltaY(Math.round(newValue));
+      const transform = this.isHorizontal ? this.state.deltaX : this.state.deltaY;
+      this.animateDelta(transform, Math.round(delta));
     }
-  };
-  handlePanResponderEnd = () => {
-    if (!this.swipe) {
-      const {direction} = this.getThemeProps();
-
-      // VERTICAL
-      const up = (direction === DIRECTIONS.UP);
-      const {deltaY} = this.state;
-      const threshold = this.layout.height / 2;
-      const endValue = Math.round(deltaY._value); // eslint-disable-line
-      
-      if ((up && endValue <= -threshold) || (!up && endValue >= threshold)) {
-        this.animateDismiss();
-      } else {
-        // back to initial position
-        this.animateDeltaY(0);
-      }
-    } else {
+  }
+  animateEnd(transform) {
+    const {direction, onDismiss} = this.getThemeProps();
+    const condition = this.isHorizontal ? (direction === DIRECTIONS.LEFT) : (direction === DIRECTIONS.UP);
+    const threshold = this.isHorizontal ? this.layout.width / 2 : this.layout.height / 2;
+    const endValue = Math.round(transform._value); // eslint-disable-line
+    
+    if (onDismiss && ((condition && endValue <= -threshold) || (!condition && endValue >= threshold))) {
       this.animateDismiss();
+    } else {
+      // back to initial position
+      this.animateDelta(transform, 0);
     }
-  };
+  }
+  animateSwipe() {
+    const {onDismiss} = this.getThemeProps();
 
-  animateDeltaY(toValue) {
-    const {deltaY} = this.state;
-
-    Animated.spring(deltaY, {
+    if (onDismiss) {
+      this.animateDismiss();
+    } else {
+      this.animateDeltaLimit();
+    }
+  }
+  animateDeltaLimit() {
+    const {direction} = this.getThemeProps();
+    const delta = (this.isHorizontal) ? this.state.deltaX : this.state.deltaY;
+    const newValue = (direction === DIRECTIONS.UP || direction === DIRECTIONS.LEFT) ?
+      -this.props.deltaLimit : this.props.deltaLimit;
+    
+    this.animateDelta(delta, newValue);
+  }
+  animateDelta(translate, toValue) {
+    Animated.spring(translate, {
       toValue,
       speed: SPEED,
       bounciness: BOUNCINESS
     }).start();
   }
-
   animateDismiss() {
     const {direction} = this.getThemeProps();
+    let translate;
+    let newValue = 0;
 
-    // VERTICAL
-    const up = (direction === DIRECTIONS.UP);
-    const {deltaY} = this.state;
-    const newValue = up ? -this.layout.height -Constants.statusBarHeight : deltaY._value + Constants.screenHeight; // eslint-disable-line
+    if (this.isHorizontal) {
+      translate = this.state.deltaX;
+      newValue = direction === DIRECTIONS.LEFT ? -Constants.screenWidth : Constants.screenWidth;
+    } else {
+      translate = this.state.deltaY;
+      newValue = (direction === DIRECTIONS.UP) ? -Constants.screenHeight : Constants.screenHeight;
+    }
 
-    Animated.timing(deltaY, {
+    Animated.timing(translate, {
       toValue: Math.round(newValue),
       duration: 280
     }).start(this.onAnimatedFinished);
@@ -139,8 +170,13 @@ export default class PanGestureView extends BaseComponent {
 
   initPositions() {
     this.setState({
-      deltaY: new Animated.Value(0)
+      deltaY: new Animated.Value(0),
+      deltaX: new Animated.Value(0)
     });
+  }
+
+  getTransformStyle() {
+    return this.isHorizontal ? {transform: [{translateX: this.state.deltaX}]} : {transform: [{translateY: this.state.deltaY}]};
   }
 
   onLayout = (event) => {
@@ -149,19 +185,13 @@ export default class PanGestureView extends BaseComponent {
 
   render() {
     const {style} = this.getThemeProps();
-
-    // VERTICAL
-    const {deltaY} = this.state;
-
+    const transformStyle = this.getTransformStyle();
+    
     return (
       <Animated.View
         style={[
           style,
-          {
-            transform: [{
-              translateY: deltaY
-            }]
-          }
+          transformStyle
         ]} 
         {...this.panResponder.panHandlers}
         onLayout={this.onLayout}
