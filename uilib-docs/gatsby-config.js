@@ -1,5 +1,5 @@
 module.exports = {
-  pathPrefix: '/react-native-ui-lib/uilib-docs',
+  pathPrefix: '/react-native-ui-lib/uilib-docs/public',
   siteMetadata: {
     title: 'RNUILIB',
   },
