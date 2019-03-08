@@ -4,14 +4,15 @@
   "version": "1.0.0",
   "author": "Kyle Mathews <mathews.kyle@gmail.com>",
   "dependencies": {
+    "babel-plugin-transform-inline-environment-variables": "^0.4.3",
     "gatsby": "^1.9.119",
     "gatsby-link": "^1.6.28",
     "gatsby-plugin-react-helmet": "^1.0.8",
     "gatsby-plugin-sass": "^1.0.14",
     "gatsby-source-filesystem": "^1.5.9",
     "gatsby-transformer-react-docgen": "^1.0.9",
-    "metro-react-native-babel-preset": "^0.48.1",
     "lodash": "^4.17.4",
+    "metro-react-native-babel-preset": "^0.48.1",
     "prop-types": "^15.6.0"
   },
   "keywords": [
